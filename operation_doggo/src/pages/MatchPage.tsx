@@ -1,5 +1,7 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import './css/matchPage.css';
 
 interface Dog {
   id: string;
@@ -15,7 +17,17 @@ interface Dog {
 const MatchPage: React.FC = () => {
 
   const location = useLocation();
+  const navigate = useNavigate();
   const dogState = location.state as { dog: Dog } | undefined;
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('/auth/logout', {}, { withCredentials: true });
+      navigate('/');
+    } catch (error) {
+      console.error("Error during logout", error);
+    }
+  };
 
   return (
     <div className="match-page">
@@ -30,6 +42,7 @@ const MatchPage: React.FC = () => {
           <p>Location: {dogState?.dog.city}, {dogState?.dog.state} {dogState?.dog.zip_code}</p>
         </div>
       )}
+      <button onClick={handleLogout} className="logout-button">Log Out</button>
     </div>
   );
 };

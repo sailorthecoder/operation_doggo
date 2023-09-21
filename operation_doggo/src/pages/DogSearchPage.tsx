@@ -81,7 +81,7 @@ const DogSearchPage: React.FC = () => {
         const zipCodes = dogs.map(dog => dog.zip_code);
         const locationResponse = await axios.post('/locations', zipCodes, { withCredentials: true });
         const locationsMap = locationResponse.data.reduce((acc: { [zip_code: string]: Location }, location: Location) => {
-            acc[location.zip_code] = location;
+            acc[location?.zip_code] = location;
             return acc;
         }, {});
 
@@ -159,6 +159,15 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('/auth/logout', {}, { withCredentials: true });
+      navigate('/');
+    } catch (error) {
+      console.error("Error during logout", error);
+    }
+  };
+
   return (
     <div className="dog-search-page">
       <h4>Search for Dogs</h4>
@@ -229,6 +238,7 @@ const DogSearchPage: React.FC = () => {
         <span>of {totalPages}</span>
         <button disabled={currentPage === totalPages} onClick={handleNextPage}>Next</button>
       </div>
+      <button onClick={handleLogout} className="logout-button">Log Out</button>
     </div>
   )
 }

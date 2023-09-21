@@ -139,3 +139,18 @@
   background-color: #0056b3;
 }
 
+.dog-search-page .logout-button {
+  padding: 10px 20px;
+  background-color: #ffdddd;
+  color: #900;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.dog-search-page .logout-button:hover {
+  background-color: #ffbbbb;
+  color: #700;
+}
