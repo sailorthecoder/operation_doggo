@@ -1,21 +1,6 @@
 import React from 'react';
+import { DogCardProps } from '../types';
 import './css/dogCard.css';
-
-interface DogCardProps {
-  dog: {
-    id: string;
-    img: string;
-    name: string;
-    age: number;
-    zip_code: string;
-    breed: string;
-    city?: string;
-    state?: string;
-  };
-  onButtonClick?: () => void;
-  buttonLabel?: string;
-  buttonColor?: string;
-}
 
 const DogCard: React.FC<DogCardProps> = ({ dog, onButtonClick, buttonLabel, buttonColor }) => {
   return (

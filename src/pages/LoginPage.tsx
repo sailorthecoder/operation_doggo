@@ -1,17 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
+import { LoginPageProps, AxiosError } from '../types'
 import './css/loginPage.css';
+import LoginDog from '../assets/LoginDog.json';
+import Lottie from 'lottie-react';
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
-
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC<LoginPageProps> = ({ setAuthenticationStatus }) => {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +22,8 @@ const LoginPage: React.FC = () => {
       withCredentials: true
     });
       if (response.status === 200) {
+        setAuthenticationStatus(true);
+        localStorage.setItem('isAuthenticated', 'true');
         navigate('/search')
       }
     } catch (err) {
@@ -37,7 +34,18 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="login-page">
-      <h2>Pup Finder 🐶</h2>
+      <h2>Pup Finder</h2>
+          <Lottie
+            animationData={LoginDog}
+            style={{
+              height: '15%',
+              width: '33%',
+              border: '1px solid',
+              margin: '25px',
+              marginTop: '0px',
+              maxWidth: '225px'
+              }}
+          />
       <form onSubmit={handleLogin}>
         <div className="input-container">
           <input

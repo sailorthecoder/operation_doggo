@@ -3,28 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import FavoritesModal from "../components/FavoritesModal";
 import DogCard from "../components/DogCard";
+import PaginationControls from "../components/PaginationControls";
+import { Dog, Location, DogSearchPageProps } from "../types";
+import LoadingDog from '../assets/LoadingDog.json';
+import Lottie from 'lottie-react';
 import './css/dogSearchPage.css';
 
-interface Dog {
-  id: string;
-  img: string;
-  name: string;
-  age: number;
-  zip_code: string;
-  breed: string;
-  city?: string;
-  state?: string;
-}
+const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
 
-interface Location {
-  zip_code: string;
-  city: string;
-  state: string;
-}
-
-const DogSearchPage: React.FC = () => {
-
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 15;
   const navigate = useNavigate();
   const [breeds, setBreeds] = useState<string[]>([]);
   const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
@@ -36,6 +23,7 @@ const DogSearchPage: React.FC = () => {
   const [prevQuery, setPrevQuery] = useState<string | null>(null);
   const [totalDogs, setTotalDogs] = useState<number>(0);
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const totalPages = useMemo(() => Math.ceil(totalDogs / PAGE_SIZE), [totalDogs, PAGE_SIZE]);
 
   useEffect(() => {
@@ -49,6 +37,7 @@ const DogSearchPage: React.FC = () => {
 
   useEffect(() => {
     const fetchDogs = async () => {
+      setIsLoading(true);
       try {
         const searchResponse = await axios.get('/dogs/search', {
           params: {
@@ -67,6 +56,7 @@ const DogSearchPage: React.FC = () => {
           const dogDetailsResponse = await axios.post('/dogs', dogIds, { withCredentials: true });
           const dogsWithLocations = await addLocationToDogs(dogDetailsResponse.data);
           setDogs(dogsWithLocations);
+          setIsLoading(false);
         } else {
           setDogs([]);
         }
@@ -97,35 +87,27 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
-  const handleNextPage = async () => {
-    if (nextQuery) {
-      const searchResponse = await axios.get(nextQuery, { withCredentials: true });
-      setCurrentPage(prevPage => prevPage + 1);
-      const dogIds = searchResponse.data.resultIds;
-      if (dogIds.length > 0) {
-        const dogDetailsResponse = await axios.post('/dogs', dogIds, { withCredentials: true });
-        setDogs(dogDetailsResponse.data);
-      } else {
-        setDogs([]);
+  const fetchPage = async (query: string | null, updatePage: (update: (page: number) => number) => void) => {
+    if (query) {
+      try {
+        const searchResponse = await axios.get(query, { withCredentials: true });
+        updatePage(prevPage => (query === nextQuery ? prevPage + 1 : prevPage - 1));
+        const dogIds = searchResponse.data.resultIds;
+        if (dogIds.length > 0) {
+          const dogDetailsResponse = await axios.post('/dogs', dogIds, { withCredentials: true });
+          setDogs(dogDetailsResponse.data);
+        } else {
+          setDogs([]);
+        }
+      } catch (error) {
+        console.error("Error fetching the page", error);
       }
     }
   };
 
-  const handlePrevPage = async () => {
-    if (prevQuery) {
-      const searchResponse = await axios.get(prevQuery, { withCredentials: true });
-      if (currentPage > 1) {
-        setCurrentPage(prevPage => prevPage - 1);
-      }
-      const dogIds = searchResponse.data.resultIds;
-      if (dogIds.length > 0) {
-        const dogDetailsResponse = await axios.post('/dogs', dogIds, { withCredentials: true });
-        setDogs(dogDetailsResponse.data);
-      } else {
-        setDogs([]);
-      }
-    }
-  };
+  const handleNextPage = () => fetchPage(nextQuery, setCurrentPage);
+
+  const handlePrevPage = () => fetchPage(prevQuery, setCurrentPage);
 
   const handleBreedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -142,8 +124,8 @@ const DogSearchPage: React.FC = () => {
 
   const toggleFavorite = (dog: Dog) => {
     setFavorites(prev => {
-      if (prev.some(d => d.id === dog.id)) {
-        return prev.filter(d => d.id !== dog.id);
+      if (prev.some(favDog => favDog.id === dog.id)) {
+        return prev.filter(favDog => favDog.id !== dog.id);
       } else {
         return [...prev, dog];
       }
@@ -160,74 +142,71 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.post('/auth/logout', {}, { withCredentials: true });
-      navigate('/');
-    } catch (error) {
-      console.error("Error during logout", error);
-    }
-  };
+  const onLogout = async () => {
+    await handleLogout();
+    navigate('/');
+  }
 
   return (
     <div className="dog-search-page">
       <h4>Search for Dogs</h4>
-      {isFavoritesModalOpen && (
-        <FavoritesModal
-          favorites={favorites}
-          getMatch={getMatch}
-          onRemove={(dogId) => {setFavorites(prev => prev.filter(dog => dog.id !== dogId))}}
-          onClose={() => setIsFavoritesModalOpen(false)}
-        />
-      )}
-      {favorites.length > 0 && (
-        <div className="buttons-container">
-          <button onClick={() => setIsFavoritesModalOpen(true)}>
-            Favorites: 🐕 {favorites.length} 🐕
-          </button>
-          <button onClick={getMatch} className="get-match-button">Get Matched!</button>
-        </div>
-      )}
-      <select value={selectedBreed === null ? 'all' : selectedBreed} onChange={handleBreedChange}>
-        <option value="" disabled>Select a breed</option>
-        <option value="all">All breeds</option>
-        {breeds.map(breed => (
-          <option key={breed} value={breed}>
-            {breed}
-          </option>
-        ))}
-      </select>
-      {selectedBreed === null && (
-        <button onClick={toggleSortOrder}>
-          Sort by Breed: {isAscending ? 'Ascending' : 'Descending'}
-        </button>
-      )}
-      {dogs.map(dog => (
-        <DogCard
-          key={dog.id}
-          dog={dog}
-          onButtonClick={() => toggleFavorite(dog)}
-          buttonLabel={favorites.some(favDog => favDog.id === dog.id) ? "Added to Favorites" : "Add to Favorites"}
-          buttonColor={favorites.some(favDog => favDog.id === dog.id) ? 'green' : '#007BFF'}
-        />
-      ))}
-      <div className="pagination-controls">
-        <button disabled={currentPage === 1} onClick={handlePrevPage}>Previous</button>
-        <span>Page</span>
-        <select
-          value={currentPage}
-          onChange={(e) => setCurrentPage(Number(e.target.value))}
-        >
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <option key={index} value={index + 1}>
-              {index + 1}
+      <div className="dog-search-page-header">
+        {isFavoritesModalOpen && (
+          <FavoritesModal
+            favorites={favorites}
+            getMatch={getMatch}
+            onRemove={(dogId) => {setFavorites(prev => prev.filter(dog => dog.id !== dogId))}}
+            onClose={() => setIsFavoritesModalOpen(false)}
+          />
+        )}
+        {favorites.length > 0 && (
+          <div className="buttons-container">
+            <button onClick={() => setIsFavoritesModalOpen(true)}>
+              Favorites: 🐕 {favorites.length} 🐕
+            </button>
+            <button onClick={getMatch} className="get-match-button">Get Matched!</button>
+          </div>
+        )}
+        <select value={selectedBreed === null ? 'all' : selectedBreed} onChange={handleBreedChange}>
+          <option value="" disabled>Select a breed</option>
+          <option value="all">All breeds</option>
+          {breeds.map(breed => (
+            <option key={breed} value={breed}>
+              {breed}
             </option>
           ))}
         </select>
-        <span>of {totalPages}</span>
-        <button disabled={currentPage === totalPages} onClick={handleNextPage}>Next</button>
+        {selectedBreed === null && (
+          <button onClick={toggleSortOrder}>
+            Sort by Breed: {isAscending ? 'Ascending' : 'Descending'}
+          </button>
+        )}
       </div>
-      <button onClick={handleLogout} className="logout-button">Log Out</button>
+      {isLoading ? (
+        <div className="loading-placeholder">
+          <Lottie animationData={LoadingDog}/>
+        </div>
+      ) : (
+        <div className="dog-cards-container">
+          {dogs.map(dog => (
+            <DogCard
+            key={dog.id}
+            dog={dog}
+            onButtonClick={() => toggleFavorite(dog)}
+            buttonLabel={favorites.some(favDog => favDog.id === dog.id) ? "Added to Favorites" : "Add to Favorites"}
+            buttonColor={favorites.some(favDog => favDog.id === dog.id) ? 'green' : '#007BFF'}
+            />
+          ))}
+        </div>
+      )}
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleNextPage={handleNextPage}
+        handlePrevPage={handlePrevPage}
+        setCurrentPage={setCurrentPage}
+      />
+      <button onClick={onLogout} className="logout-button">Log Out</button>
     </div>
   )
 }

@@ -1,24 +1,7 @@
 import React from 'react';
 import DogCard from './DogCard';
+import { FavoritesModalProps } from '../types'
 import './css/favoritesModal.css'
-
-interface Dog {
-  id: string;
-  img: string;
-  name: string;
-  age: number;
-  zip_code: string;
-  breed: string;
-  city?: string;
-  state?: string;
-}
-
-interface FavoritesModalProps {
-  favorites: Dog[];
-  getMatch: () => void;
-  onRemove: (dogId: string) => void;
-  onClose: () => void;
-}
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({ favorites, getMatch, onRemove, onClose }) => {
 

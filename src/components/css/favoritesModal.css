@@ -22,7 +22,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.close-modal-btn {
+.dog-search-page .close-modal-btn {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -42,4 +42,3 @@
   font-family: Arial, sans-serif;
   font-size: 15px;
 }
-
