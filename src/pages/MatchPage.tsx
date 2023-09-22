@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import DogCard from '../components/DogCard';
 import './css/matchPage.css';
 
 interface Dog {
@@ -32,16 +33,7 @@ const MatchPage: React.FC = () => {
   return (
     <div className="match-page">
       <h1>You Matched with {dogState?.dog?.name}!</h1>
-      {dogState?.dog && (
-        <div className="dogState?.dog-card">
-          <div style={{ textAlign: 'center' }}>
-            <img src={dogState?.dog.img} alt={dogState?.dog.name} style={{ maxWidth: '100%', height: 'auto' }} />
-          </div>
-          <p>Breed: {dogState?.dog.breed}</p>
-          <p>Age: {dogState?.dog.age}</p>
-          <p>Location: {dogState?.dog.city}, {dogState?.dog.state} {dogState?.dog.zip_code}</p>
-        </div>
-      )}
+      {dogState?.dog && <DogCard dog={dogState.dog} />}
       <button onClick={handleLogout} className="logout-button">Log Out</button>
     </div>
   );

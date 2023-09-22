@@ -1,4 +1,5 @@
 import React from 'react';
+import DogCard from './DogCard';
 import './css/favoritesModal.css'
 
 interface Dog {
@@ -33,16 +34,12 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({ favorites, getMatch, on
     <div className="favorites-modal">
       <button className="close-modal-btn" onClick={onClose}>x</button>
       {favorites.map(dog => (
-        <div key={dog.id} className="dog-card">
-          <div style={{ textAlign: 'center' }}>
-            <img src={dog.img} alt={dog.name} style={{ maxWidth: '100%', height: 'auto' }} />
-          </div>
-          <h6>{dog.name}</h6>
-          <p>Breed: {dog.breed}</p>
-          <p>Age: {dog.age}</p>
-          <p>Location: {dog.city}, {dog.state} {dog.zip_code}</p>
-          <button onClick={() => handleRemoval(dog.id)}>Remove from Favorites</button>
-        </div>
+        <DogCard
+          key={dog.id}
+          dog={dog}
+          onButtonClick={() => handleRemoval(dog.id)}
+          buttonLabel="Remove from Favorites"
+        />
       ))}
       <button onClick={getMatch} className="get-match-button">Get Matched!</button>
       </div>

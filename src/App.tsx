@@ -4,7 +4,6 @@ import axios from 'axios';
 import LoginPage from './pages/LoginPage';
 import DogSearchPage from './pages/DogSearchPage';
 import MatchPage from './pages/MatchPage';
-import './App.css';
 
 axios.defaults.baseURL = 'https://frontend-take-home-service.fetch.com';
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import FavoritesModal from "../components/FavoritesModal";
+import DogCard from "../components/DogCard";
 import './css/dogSearchPage.css';
 
 interface Dog {
@@ -202,25 +203,13 @@ const DogSearchPage: React.FC = () => {
         </button>
       )}
       {dogs.map(dog => (
-        <div key={dog.id} className="dog-card">
-          <div style={{ textAlign: 'center' }}>
-            <img
-              src={dog.img}
-              alt={dog.name}
-              style={{ maxWidth: '100%', height: 'auto' }}
-            />
-          </div>
-          <h6>{dog.name}</h6>
-          <p>Breed: {dog.breed}</p>
-          <p>Age: {dog.age}</p>
-          <p>Location: {dog.city}, {dog.state} {dog.zip_code}</p>
-          <button
-            onClick={() => toggleFavorite(dog)}
-            style={{ backgroundColor: favorites.some(d => d.id === dog.id) ? 'green' : '#007BFF', color: 'white' }}
-          >
-            {favorites.some(d => d.id === dog.id) ? "Added to Favorites" : "Add to Favorites"}
-          </button>
-        </div>
+        <DogCard
+          key={dog.id}
+          dog={dog}
+          onButtonClick={() => toggleFavorite(dog)}
+          buttonLabel={favorites.some(favDog => favDog.id === dog.id) ? "Added to Favorites" : "Add to Favorites"}
+          buttonColor={favorites.some(favDog => favDog.id === dog.id) ? 'green' : '#007BFF'}
+        />
       ))}
       <div className="pagination-controls">
         <button disabled={currentPage === 1} onClick={handlePrevPage}>Previous</button>
