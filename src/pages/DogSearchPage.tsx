@@ -70,6 +70,7 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
       }
     };
     fetchDogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBreed, currentPage, isAscending, shouldApplyFilter]);
 
   const addLocationToDogs = async (dogs: Dog[]) => {
