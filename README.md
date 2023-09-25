@@ -1,4 +1,4 @@
-Pup Finder
+# **Pup Finder**
 
 Pup Finder is an application that helps you find adoptable dogs.
 
