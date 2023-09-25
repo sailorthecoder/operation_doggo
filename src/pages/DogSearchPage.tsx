@@ -11,7 +11,7 @@ import './css/dogSearchPage.css';
 
 const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
 
-  const PAGE_SIZE = 15;
+  const PAGE_SIZE = 25;
   const navigate = useNavigate();
   const [breeds, setBreeds] = useState<string[]>([]);
   const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
@@ -22,6 +22,9 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
   const [nextQuery, setNextQuery] = useState<string | null>(null);
   const [prevQuery, setPrevQuery] = useState<string | null>(null);
   const [totalDogs, setTotalDogs] = useState<number>(0);
+  const [ageMin, setAgeMin] = useState<number | null>(null);
+  const [ageMax, setAgeMax] = useState<number | null>(null);
+  const [shouldApplyFilter, setShouldApplyFilter] = useState(false);
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const totalPages = useMemo(() => Math.ceil(totalDogs / PAGE_SIZE), [totalDogs, PAGE_SIZE]);
@@ -42,6 +45,8 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
         const searchResponse = await axios.get('/dogs/search', {
           params: {
             breeds: selectedBreed ? [selectedBreed] : undefined,
+            ageMin,
+            ageMax,
             sort: `breed:${isAscending ? 'asc' : 'desc'}`,
             size: PAGE_SIZE,
             from: currentPage === 1 ? undefined : (currentPage - 1) * PAGE_SIZE,
@@ -65,7 +70,7 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
       }
     };
     fetchDogs();
-  }, [selectedBreed, currentPage, isAscending]);
+  }, [selectedBreed, currentPage, isAscending, shouldApplyFilter]);
 
   const addLocationToDogs = async (dogs: Dog[]) => {
     try {
@@ -104,6 +109,23 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
       }
     }
   };
+
+  const handleApplyFilter = () => {
+    let isInvalid = false;
+    if (ageMin !== null && ageMin < 0) {
+      isInvalid = true;
+    }
+    if (ageMax !== null && ageMax < 0) {
+      isInvalid = true;
+    }
+    if (ageMin !== null && ageMax !== null && ageMin > ageMax) {
+      isInvalid = true;
+    }
+    if (!isInvalid) {
+      setShouldApplyFilter(!shouldApplyFilter);
+    }
+  };
+
 
   const handleNextPage = () => fetchPage(nextQuery, setCurrentPage);
 
@@ -159,28 +181,58 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
             onClose={() => setIsFavoritesModalOpen(false)}
           />
         )}
-        {favorites.length > 0 && (
+        <div className="upper-container">
+          <select value={selectedBreed === null ? 'all' : selectedBreed} onChange={handleBreedChange}>
+            <option value="" disabled>Select a breed</option>
+            <option value="all">All breeds</option>
+            {breeds.map(breed => (
+              <option key={breed} value={breed}>
+                {breed}
+              </option>
+            ))}
+          </select>
+          {favorites.length > 0 && (
           <div className="buttons-container">
             <button onClick={() => setIsFavoritesModalOpen(true)}>
               Favorites: 🐕 {favorites.length} 🐕
             </button>
             <button onClick={getMatch} className="get-match-button">Get Matched!</button>
           </div>
-        )}
-        <select value={selectedBreed === null ? 'all' : selectedBreed} onChange={handleBreedChange}>
-          <option value="" disabled>Select a breed</option>
-          <option value="all">All breeds</option>
-          {breeds.map(breed => (
-            <option key={breed} value={breed}>
-              {breed}
-            </option>
-          ))}
-        </select>
-        {selectedBreed === null && (
-          <button onClick={toggleSortOrder}>
-            Sort by Breed: {isAscending ? 'Ascending' : 'Descending'}
-          </button>
-        )}
+            )}
+        </div>
+        <div className="sort-filter-container">
+          {selectedBreed === null && (
+            <button onClick={toggleSortOrder}>
+              Sort by Breed: {isAscending ? 'Ascending' : 'Descending'}
+            </button>
+          )}
+          <div className="age-filters">
+            <label>
+              Filter by Age:
+              <input
+                type="number"
+                min="0"
+                value={ageMin ?? ''}
+                onChange={(e) => setAgeMin(Number(e.target.value) || null)}
+                placeholder="Min"
+              />
+              -
+              <input
+                type="number"
+                min="0"
+                value={ageMax ?? ''}
+                onChange={(e) => setAgeMax(Number(e.target.value) || null)}
+                placeholder="Max"
+              />
+            </label>
+            {(ageMin !== null && ageMin < 0) ||
+            (ageMax !== null && ageMax < 0) ||
+            (ageMin !== null && ageMax !== null && ageMin > ageMax) ? (
+              <p style={{ color: 'red' }}>Please enter a valid range</p>
+            ) : null}
+          </div>
+          <button onClick={handleApplyFilter}>Apply Filter</button>
+        </div>
       </div>
       {isLoading ? (
         <div className="loading-placeholder">

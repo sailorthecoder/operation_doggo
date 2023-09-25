@@ -15,9 +15,11 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onButtonClick, buttonLabel, butt
         <p>Location: {dog.city}, {dog.state} {dog.zip_code}</p>
       </div>
       {onButtonClick && buttonLabel && (
+      <div className="button-container">
         <button onClick={onButtonClick} style={{ backgroundColor: buttonColor || '#007BFF' }}>
           {buttonLabel}
         </button>
+      </div>
       )}
     </div>
   );
