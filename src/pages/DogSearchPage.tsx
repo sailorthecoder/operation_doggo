@@ -11,7 +11,7 @@ import './css/dogSearchPage.css';
 
 const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
 
-  const PAGE_SIZE = 25;
+  const PAGE_SIZE = 100;
   const navigate = useNavigate();
   const [breeds, setBreeds] = useState<string[]>([]);
   const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
@@ -73,23 +73,24 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBreed, currentPage, isAscending, shouldApplyFilter]);
 
+
   const addLocationToDogs = async (dogs: Dog[]) => {
     try {
-        const zipCodes = dogs.map(dog => dog.zip_code);
-        const locationResponse = await axios.post('/locations', zipCodes, { withCredentials: true });
-        const locationsMap = locationResponse.data.reduce((acc: { [zip_code: string]: Location }, location: Location) => {
-            acc[location?.zip_code] = location;
-            return acc;
-        }, {});
+      const zipCodes = dogs.map(dog => dog.zip_code);
+      const locationResponse = await axios.post('/locations', zipCodes, { withCredentials: true });
+      const locationsMap = locationResponse.data.reduce((acc: { [zip_code: string]: Location }, location: Location) => {
+        acc[location?.zip_code] = location;
+        return acc;
+      }, {});
 
-        return dogs.map(dog => ({
-            ...dog,
-            city: locationsMap[dog.zip_code]?.city,
-            state: locationsMap[dog.zip_code]?.state
-        }));
+      return dogs.map(dog => ({
+        ...dog,
+        city: locationsMap[dog.zip_code]?.city,
+        state: locationsMap[dog.zip_code]?.state
+      }));
     } catch (error) {
-        console.error("Error fetching the locations", error);
-        return dogs;
+      console.error("Error fetching the locations", error);
+      return dogs;
     }
   };
 
