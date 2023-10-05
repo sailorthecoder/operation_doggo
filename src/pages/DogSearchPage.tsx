@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import FavoritesModal from "../components/FavoritesModal";
 import DogCard from "../components/DogCard";
 import PaginationControls from "../components/PaginationControls";
-import { Dog, Location, DogSearchPageProps } from "../types";
-import LoadingDog from '../assets/LoadingDog.json';
+import { Dog, DogSearchPageProps } from "../types";
+import LoadingDog from '../assets/lottieFiles/LoadingDog.json';
 import Lottie from 'lottie-react';
 import './css/dogSearchPage.css';
+import dogData from '../assets/db.json';
+
 
 const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
 
@@ -19,119 +20,79 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isAscending, setIsAscending] = useState<boolean>(true);
   const [favorites, setFavorites] = useState<Dog[]>([]);
-  const [nextQuery, setNextQuery] = useState<string | null>(null);
-  const [prevQuery, setPrevQuery] = useState<string | null>(null);
   const [totalDogs, setTotalDogs] = useState<number>(0);
   const [ageMin, setAgeMin] = useState<number | null>(null);
   const [ageMax, setAgeMax] = useState<number | null>(null);
-  const [shouldApplyFilter, setShouldApplyFilter] = useState(false);
+  const [tempAgeMin, setTempAgeMin] = useState<number | null>(null);
+  const [tempAgeMax, setTempAgeMax] = useState<number | null>(null);
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const totalPages = useMemo(() => Math.ceil(totalDogs / PAGE_SIZE), [totalDogs, PAGE_SIZE]);
 
+
   useEffect(() => {
-    const fetchBreeds = async () => {
-      const response = await axios.get('/dogs/breeds', { withCredentials: true });
-      const sortedBreeds = response.data.sort();
-      setBreeds(sortedBreeds);
+    const fetchBreeds = () => {
+      const breedsFromData = Array.from(new Set(dogData.dogData.map(dog => dog.breed))).sort();
+      setBreeds(breedsFromData);
     };
     fetchBreeds();
   }, []);
 
   useEffect(() => {
-    const fetchDogs = async () => {
-      setIsLoading(true);
-      try {
-        const searchResponse = await axios.get('/dogs/search', {
-          params: {
-            breeds: selectedBreed ? [selectedBreed] : undefined,
-            ageMin,
-            ageMax,
-            sort: `breed:${isAscending ? 'asc' : 'desc'}`,
-            size: PAGE_SIZE,
-            from: currentPage === 1 ? undefined : (currentPage - 1) * PAGE_SIZE,
-          },
-          withCredentials: true
-        });
-        setNextQuery(searchResponse.data.next);
-        setPrevQuery(searchResponse.data.prev);
-        setTotalDogs(searchResponse.data.total);
-        const dogIds = searchResponse.data.resultIds;
-        if (dogIds.length > 0) {
-          const dogDetailsResponse = await axios.post('/dogs', dogIds, { withCredentials: true });
-          const dogsWithLocations = await addLocationToDogs(dogDetailsResponse.data);
-          setDogs(dogsWithLocations);
-          setIsLoading(false);
-        } else {
-          setDogs([]);
-        }
-      } catch (error) {
-        console.error("Error fetching the dogs", error);
+    setIsLoading(true);
+    const fetchDogs = () => {
+      let filteredDogs = dogData.dogData;
+      if (selectedBreed) {
+        filteredDogs = filteredDogs.filter(dog => dog.breed === selectedBreed);
       }
+      if (ageMin !== null) {
+        filteredDogs = filteredDogs.filter(dog => dog.age >= ageMin);
+      }
+      if (ageMax !== null) {
+        filteredDogs = filteredDogs.filter(dog => dog.age <= ageMax);
+      }
+      if (isAscending) {
+        filteredDogs.sort((a, b) => a.breed.localeCompare(b.breed));
+      } else {
+        filteredDogs.sort((a, b) => b.breed.localeCompare(a.breed));
+      }
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const paginatedDogs = filteredDogs.slice(startIndex, startIndex + PAGE_SIZE);
+      setTotalDogs(filteredDogs.length);
+      setDogs(paginatedDogs);
+      setIsLoading(false);
     };
     fetchDogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedBreed, currentPage, isAscending, shouldApplyFilter]);
-
-
-  const addLocationToDogs = async (dogs: Dog[]) => {
-    try {
-      const zipCodes = dogs.map(dog => dog.zip_code);
-      const locationResponse = await axios.post('/locations', zipCodes, { withCredentials: true });
-      const locationsMap = locationResponse.data.reduce((acc: { [zip_code: string]: Location }, location: Location) => {
-        acc[location?.zip_code] = location;
-        return acc;
-      }, {});
-
-      return dogs.map(dog => ({
-        ...dog,
-        city: locationsMap[dog.zip_code]?.city,
-        state: locationsMap[dog.zip_code]?.state
-      }));
-    } catch (error) {
-      console.error("Error fetching the locations", error);
-      return dogs;
-    }
-  };
-
-  const fetchPage = async (query: string | null, updatePage: (update: (page: number) => number) => void) => {
-    if (query) {
-      try {
-        const searchResponse = await axios.get(query, { withCredentials: true });
-        updatePage(prevPage => (query === nextQuery ? prevPage + 1 : prevPage - 1));
-        const dogIds = searchResponse.data.resultIds;
-        if (dogIds.length > 0) {
-          const dogDetailsResponse = await axios.post('/dogs', dogIds, { withCredentials: true });
-          setDogs(dogDetailsResponse.data);
-        } else {
-          setDogs([]);
-        }
-      } catch (error) {
-        console.error("Error fetching the page", error);
-      }
-    }
-  };
+  }, [selectedBreed, currentPage, isAscending, ageMin, ageMax]);
 
   const handleApplyFilter = () => {
     let isInvalid = false;
-    if (ageMin !== null && ageMin < 0) {
+    if (tempAgeMin !== null && tempAgeMin < 0) {
       isInvalid = true;
     }
-    if (ageMax !== null && ageMax < 0) {
+    if (tempAgeMax !== null && tempAgeMax < 0) {
       isInvalid = true;
     }
-    if (ageMin !== null && ageMax !== null && ageMin > ageMax) {
+    if (tempAgeMin !== null && tempAgeMax !== null && tempAgeMin > tempAgeMax) {
       isInvalid = true;
     }
     if (!isInvalid) {
-      setShouldApplyFilter(!shouldApplyFilter);
+      setAgeMin(tempAgeMin);
+      setAgeMax(tempAgeMax);
     }
   };
 
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
 
-  const handleNextPage = () => fetchPage(nextQuery, setCurrentPage);
-
-  const handlePrevPage = () => fetchPage(prevQuery, setCurrentPage);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
+  };
 
   const handleBreedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -156,18 +117,14 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
     });
   };
 
-  const getMatch = async () => {
-    try {
-      const response = await axios.post('/dogs/match', favorites, { withCredentials: true });
-      const matchedDog = response.data.match;
-      navigate(`/match`, { state: { dog: matchedDog } });
-    } catch (error) {
-      console.error("Error fetching the match", error);
-    }
-  };
+  const getMatch = () => {
+    const randomIndex = Math.floor(Math.random() * favorites.length);
+    const matchedDog = favorites[randomIndex];
+    navigate(`/match`, { state: { dog: matchedDog } });
+};
 
-  const onLogout = async () => {
-    await handleLogout();
+  const onLogout = () => {
+    handleLogout();
     navigate('/');
   }
 
@@ -214,24 +171,24 @@ const DogSearchPage: React.FC<DogSearchPageProps> = ({ handleLogout }) => {
               <input
                 type="number"
                 min="0"
-                value={ageMin ?? ''}
-                onChange={(e) => setAgeMin(Number(e.target.value) || null)}
+                value={tempAgeMin ?? ''}
+                onChange={(e) => setTempAgeMin(Number(e.target.value) || null)}
                 placeholder="Min"
               />
               -
               <input
                 type="number"
                 min="0"
-                value={ageMax ?? ''}
-                onChange={(e) => setAgeMax(Number(e.target.value) || null)}
+                value={tempAgeMax ?? ''}
+                onChange={(e) => setTempAgeMax(Number(e.target.value) || null)}
                 placeholder="Max"
               />
             </label>
-            {(ageMin !== null && ageMin < 0) ||
-            (ageMax !== null && ageMax < 0) ||
-            (ageMin !== null && ageMax !== null && ageMin > ageMax) ? (
-              <p style={{ color: 'red' }}>Please enter a valid range</p>
-            ) : null}
+              {(tempAgeMin !== null && tempAgeMin < 0) ||
+              (tempAgeMax !== null && tempAgeMax < 0) ||
+              (tempAgeMin !== null && tempAgeMax !== null && tempAgeMin > tempAgeMax) ? (
+                  <p style={{ color: 'red' }}>Please enter a valid range</p>
+              ) : null}
           </div>
           <button onClick={handleApplyFilter}>Apply Filter</button>
         </div>

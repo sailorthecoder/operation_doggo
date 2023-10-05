@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DogCard from '../components/DogCard';
 import { Dog, MatchPageProps } from '../types';
-import Streamers from '../assets/Streamers.json';
+import Streamers from '../assets/lottieFiles/Streamers.json';
 import Lottie from 'lottie-react';
 import './css/matchPage.css';
 
@@ -12,8 +12,8 @@ const MatchPage: React.FC<MatchPageProps> = ({ handleLogout }) => {
   const location = useLocation();
   const dogState = location.state as { dog: Dog } | undefined;
 
-  const onLogout = async () => {
-    await handleLogout();
+  const onLogout = () => {
+    handleLogout();
     navigate('/');
   }
 

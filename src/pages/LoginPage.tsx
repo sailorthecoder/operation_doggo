@@ -1,35 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
-import { LoginPageProps, AxiosError } from '../types'
+import { LoginPageProps } from '../types'
 import './css/loginPage.css';
-import LoginDog from '../assets/LoginDog.json';
+import LoginDog from '../assets/lottieFiles/LoginDog.json';
 import Lottie from 'lottie-react';
 
 const LoginPage: React.FC<LoginPageProps> = ({ setAuthenticationStatus }) => {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    try{
-      const response = await axios.post('https://frontend-take-home-service.fetch.com/auth/login', {
-        name: name,
-        email: email
-    }, {
-      withCredentials: true
-    });
-      if (response.status === 200) {
-        setAuthenticationStatus(true);
-        localStorage.setItem('isAuthenticated', 'true');
-        navigate('/search')
-      }
-    } catch (err) {
-      const axiosError = err as AxiosError;
-      setError(axiosError.response?.data?.message || 'Failed to Login!');
-    }
+    setAuthenticationStatus(true);
+    localStorage.setItem('isAuthenticated', 'true');
+    navigate('/search');
   }
 
   return (
@@ -64,9 +49,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ setAuthenticationStatus }) => {
           />
         </div>
         <button className="login-button" type="submit">Login</button>
-        {error && (
-          <div className="error-message">{error}</div>
-        )}
       </form>
     </div>
   )

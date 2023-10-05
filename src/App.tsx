@@ -1,9 +1,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import axios from 'axios';
 import ProtectedRoute from './components/ProtectedRoute';
 
-axios.defaults.baseURL = 'https://frontend-take-home-service.fetch.com';
 const LazyLoginPage = React.lazy(() => import('./pages/LoginPage'));
 const LazyDogSearchPage = React.lazy(() => import('./pages/DogSearchPage'));
 const LazyMatchPage = React.lazy(() => import('./pages/MatchPage'));
@@ -17,14 +15,9 @@ const App = () => {
     setIsAuthenticated(authStatus === 'true');
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await axios.post('/auth/logout', {}, { withCredentials: true });
-      setIsAuthenticated(false);
-      localStorage.setItem('isAuthenticated', 'false');
-    } catch (error) {
-      console.error("Error during logout", error);
-    }
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.setItem('isAuthenticated', 'false');
   }
 
   return (

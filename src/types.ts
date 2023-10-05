@@ -16,11 +16,11 @@ export interface Location {
 }
 
 export interface DogSearchPageProps {
-  handleLogout: () => Promise<void>
+  handleLogout: () => void;
 }
 
 export interface MatchPageProps {
-  handleLogout: () => Promise<void>
+  handleLogout: () => void;
 }
 
 export interface LoginPageProps {
