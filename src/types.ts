@@ -15,8 +15,11 @@ export interface Location {
   state: string;
 }
 
-export interface DogSearchPageProps {
+export interface SearchPageProps {
   handleLogout: () => void;
+  dogData: {
+    dogData: Dog[];
+  };
 }
 
 export interface MatchPageProps {
@@ -39,6 +42,7 @@ export interface DogCardProps {
   onButtonClick?: () => void;
   buttonLabel?: string;
   buttonColor?: string;
+  customStyle?: React.CSSProperties;
 }
 
 export interface ProtectedRouteProps {

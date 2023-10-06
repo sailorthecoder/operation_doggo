@@ -2,7 +2,7 @@ import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import LoginPage from '../pages/LoginPage';
+import LoginPage from '../pages';
 
 jest.mock('lottie-react', () => {
   return function DummyLottie() {

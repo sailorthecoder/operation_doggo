@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import DogSearchPage from '../pages/DogSearchPage';
+import DogSearchPage from '../pages/search';
 import * as React from 'react';
 
 jest.mock('lottie-react', () => () => <div />);

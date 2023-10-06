@@ -1,7 +1,7 @@
 import React from 'react';
 import DogCard from './DogCard';
 import { FavoritesModalProps } from '../types'
-import './css/favoritesModal.css'
+import styles from './css/favoritesModal.module.css'
 
 const FavoritesModal: React.FC<FavoritesModalProps> = ({ favorites, getMatch, onRemove, onClose }) => {
 
@@ -13,18 +13,18 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({ favorites, getMatch, on
   }
 
   return (
-  <div className="favorites-modal-overlay">
-    <div className="favorites-modal">
-      <button className="close-modal-btn" onClick={onClose}>x</button>
-      {favorites.map(dog => (
-        <DogCard
-          key={dog.id}
-          dog={dog}
-          onButtonClick={() => handleRemoval(dog.id)}
-          buttonLabel="Remove from Favorites"
-        />
-      ))}
-      <button onClick={getMatch} className="get-match-button">Get Matched!</button>
+    <div className={styles.favoritesModalOverlay}>
+      <div className={styles.favoritesModal}>
+        <button className={styles.closeModalBtn} onClick={onClose}>x</button>
+        {favorites.map(dog => (
+          <DogCard
+            key={dog.id}
+            dog={dog}
+            onButtonClick={() => handleRemoval(dog.id)}
+            buttonLabel="Remove from Favorites"
+          />
+        ))}
+        <button onClick={getMatch} className={styles.getMatchButton}>Get Matched!</button>
       </div>
     </div>
   );
