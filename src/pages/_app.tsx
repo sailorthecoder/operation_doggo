@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
+import Header from '../components/Header';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -15,7 +16,10 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   };
 
   return (
-    <Component {...pageProps} isAuthenticated={isAuthenticated} handleLogout={handleLogout} setAuthenticationStatus={setIsAuthenticated} />
+    <>
+      <Header/>
+      <Component {...pageProps} isAuthenticated={isAuthenticated} handleLogout={handleLogout} setAuthenticationStatus={setIsAuthenticated} />
+    </>
   );
 };
 
