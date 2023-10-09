@@ -1,6 +1,6 @@
-import React from 'react';
-import {PaginationControlsProps} from '../types'
-import styles from './css/paginationControls.module.css';
+import React from "react";
+import { PaginationControlsProps } from "../types";
+import styles from "./css/paginationControls.module.css";
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
@@ -10,7 +10,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   setCurrentPage,
 }) => (
   <div className={styles.paginationControls}>
-    <button disabled={currentPage === 1} onClick={handlePrevPage}>Previous</button>
+    <button disabled={currentPage === 1} onClick={handlePrevPage}>
+      Previous
+    </button>
     <span>Page</span>
     <select
       value={currentPage}
@@ -23,7 +25,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
       ))}
     </select>
     <span>of {totalPages}</span>
-    <button disabled={currentPage === totalPages} onClick={handleNextPage}>Next</button>
+    <button disabled={currentPage === totalPages} onClick={handleNextPage}>
+      Next
+    </button>
   </div>
 );
 

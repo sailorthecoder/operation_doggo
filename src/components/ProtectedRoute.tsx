@@ -1,14 +1,16 @@
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { ProtectedRouteProps } from '../types'
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { ProtectedRouteProps } from "../types";
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ isAuthenticated, children }) => {
-
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  isAuthenticated,
+  children,
+}) => {
   const router = useRouter();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.replace('/');
+      router.replace("/");
     }
   }, [isAuthenticated, router]);
 

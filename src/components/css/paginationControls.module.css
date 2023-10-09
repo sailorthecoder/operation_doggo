@@ -12,10 +12,10 @@
 
 .paginationControls select {
   padding: 8px 10px;
-  border: 1px solid #007BFF;
+  border: 1px solid #007bff;
   border-radius: 5px;
   background-color: #fff;
-  color: #007BFF;
+  color: #007bff;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -29,7 +29,7 @@
 
 .paginationControls button {
   padding: 8px 16px;
-  background-color: #007BFF;
+  background-color: #007bff;
   border: none;
   cursor: pointer;
   color: white;

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import FavoritesModal from "../components/FavoritesModal";
 import DogCard from "../components/DogCard";
 import PaginationControls from "../components/PaginationControls";
 import { Dog, SearchPageProps } from "../types";
-import db from '../db.json'
-import LoadingDog from '../../public/lottieFiles/LoadingDog.json';
-import Lottie from 'lottie-react';
-import styles from './css/dogSearchPage.module.css';
+import db from "../db.json";
+import LoadingDog from "../../public/lottieFiles/LoadingDog.json";
+import Lottie from "lottie-react";
+import styles from "./css/dogSearchPage.module.css";
 
 export const getStaticProps = async () => {
   const dogData = db;
@@ -15,7 +15,6 @@ export const getStaticProps = async () => {
 };
 
 const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
-
   const PAGE_SIZE = 25;
   const router = useRouter();
   const [breeds, setBreeds] = useState<string[]>([]);
@@ -29,14 +28,19 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
   const [ageMax, setAgeMax] = useState<number | null>(null);
   const [tempAgeMin, setTempAgeMin] = useState<number | null>(null);
   const [tempAgeMax, setTempAgeMax] = useState<number | null>(null);
-  const [isFavoritesModalOpen, setIsFavoritesModalOpen] = useState<boolean>(false);
+  const [isFavoritesModalOpen, setIsFavoritesModalOpen] =
+    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const totalPages = useMemo(() => Math.ceil(totalDogs / PAGE_SIZE), [totalDogs, PAGE_SIZE]);
-
+  const totalPages = useMemo(
+    () => Math.ceil(totalDogs / PAGE_SIZE),
+    [totalDogs, PAGE_SIZE]
+  );
 
   useEffect(() => {
     const fetchBreeds = () => {
-      const breedsFromData = Array.from(new Set(dogData.dogData.map(dog => dog.breed))).sort();
+      const breedsFromData = Array.from(
+        new Set(dogData.dogData.map((dog) => dog.breed))
+      ).sort();
       setBreeds(breedsFromData);
     };
     fetchBreeds();
@@ -47,13 +51,15 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     const fetchDogs = () => {
       let filteredDogs = dogData.dogData;
       if (selectedBreed) {
-        filteredDogs = filteredDogs.filter(dog => dog.breed === selectedBreed);
+        filteredDogs = filteredDogs.filter(
+          (dog) => dog.breed === selectedBreed
+        );
       }
       if (ageMin !== null) {
-        filteredDogs = filteredDogs.filter(dog => dog.age >= ageMin);
+        filteredDogs = filteredDogs.filter((dog) => dog.age >= ageMin);
       }
       if (ageMax !== null) {
-        filteredDogs = filteredDogs.filter(dog => dog.age <= ageMax);
+        filteredDogs = filteredDogs.filter((dog) => dog.age <= ageMax);
       }
       if (isAscending) {
         filteredDogs.sort((a, b) => a.breed.localeCompare(b.breed));
@@ -61,7 +67,10 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
         filteredDogs.sort((a, b) => b.breed.localeCompare(a.breed));
       }
       const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const paginatedDogs = filteredDogs.slice(startIndex, startIndex + PAGE_SIZE);
+      const paginatedDogs = filteredDogs.slice(
+        startIndex,
+        startIndex + PAGE_SIZE
+      );
       setTotalDogs(filteredDogs.length);
       setDogs(paginatedDogs);
       setIsLoading(false);
@@ -88,13 +97,13 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(prevPage => prevPage + 1);
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(prevPage => prevPage - 1);
+      setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
@@ -105,16 +114,16 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
   };
 
   const toggleSortOrder = () => {
-    setIsAscending(prevIsAscending => !prevIsAscending);
+    setIsAscending((prevIsAscending) => !prevIsAscending);
     if (selectedBreed === null) {
       setCurrentPage(1);
     }
   };
 
   const toggleFavorite = (dog: Dog) => {
-    setFavorites(prev => {
-      if (prev.some(favDog => favDog.id === dog.id)) {
-        return prev.filter(favDog => favDog.id !== dog.id);
+    setFavorites((prev) => {
+      if (prev.some((favDog) => favDog.id === dog.id)) {
+        return prev.filter((favDog) => favDog.id !== dog.id);
       } else {
         return [...prev, dog];
       }
@@ -126,12 +135,12 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     const matchedDog = favorites[randomIndex];
     const dogDataString = encodeURIComponent(JSON.stringify(matchedDog));
     router.push(`/match?dog=${dogDataString}`);
-};
+  };
 
   const onLogout = () => {
     handleLogout();
-    router.push('/');;
-  }
+    router.push("/");
+  };
 
   return (
     <div className={styles.dogSearchPage}>
@@ -141,37 +150,43 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
           <FavoritesModal
             favorites={favorites}
             getMatch={getMatch}
-            onRemove={(dogId) => {setFavorites(prev => prev.filter(dog => dog.id !== dogId))}}
+            onRemove={(dogId) => {
+              setFavorites((prev) => prev.filter((dog) => dog.id !== dogId));
+            }}
             onClose={() => setIsFavoritesModalOpen(false)}
           />
         )}
         <div className={styles.upperContainer}>
           <select
-              value={selectedBreed === null ? 'all' : selectedBreed}
-              onChange={handleBreedChange}
-              className={styles.breedSelect}
+            value={selectedBreed === null ? "all" : selectedBreed}
+            onChange={handleBreedChange}
+            className={styles.breedSelect}
           >
-            <option value="" disabled>Select a breed</option>
+            <option value="" disabled>
+              Select a breed
+            </option>
             <option value="all">All breeds</option>
-            {breeds.map(breed => (
+            {breeds.map((breed) => (
               <option key={breed} value={breed}>
                 {breed}
               </option>
             ))}
           </select>
           {favorites.length > 0 && (
-          <div className={styles.buttonsContainer}>
-            <button onClick={() => setIsFavoritesModalOpen(true)}>
-              Favorites: 🐕 {favorites.length} 🐕
-            </button>
-            <button onClick={getMatch} className={styles.getMatchButton}>Get Matched!</button>
-          </div>
-            )}
+            <div className={styles.buttonsContainer}>
+              <button onClick={() => setIsFavoritesModalOpen(true)}>
+                Favorites: 🐕 {favorites.length} 🐕
+              </button>
+              <button onClick={getMatch} className={styles.getMatchButton}>
+                Get Matched!
+              </button>
+            </div>
+          )}
         </div>
         <div className={styles.sortFilterContainer}>
           {selectedBreed === null && (
             <button onClick={toggleSortOrder}>
-              Sort by Breed: {isAscending ? 'Ascending' : 'Descending'}
+              Sort by Breed: {isAscending ? "Ascending" : "Descending"}
             </button>
           )}
           <div className={styles.ageFilters}>
@@ -180,7 +195,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
               <input
                 type="number"
                 min="0"
-                value={tempAgeMin ?? ''}
+                value={tempAgeMin ?? ""}
                 onChange={(e) => setTempAgeMin(Number(e.target.value) || null)}
                 placeholder="Min"
               />
@@ -188,34 +203,49 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
               <input
                 type="number"
                 min="0"
-                value={tempAgeMax ?? ''}
+                value={tempAgeMax ?? ""}
                 onChange={(e) => setTempAgeMax(Number(e.target.value) || null)}
                 placeholder="Max"
               />
             </label>
-              {(tempAgeMin !== null && tempAgeMin < 0) ||
-              (tempAgeMax !== null && tempAgeMax < 0) ||
-              (tempAgeMin !== null && tempAgeMax !== null && tempAgeMin > tempAgeMax) ? (
-                  <p style={{ color: 'red' }}>Please enter a valid range</p>
-              ) : null}
+            {(tempAgeMin !== null && tempAgeMin < 0) ||
+            (tempAgeMax !== null && tempAgeMax < 0) ||
+            (tempAgeMin !== null &&
+              tempAgeMax !== null &&
+              tempAgeMin > tempAgeMax) ? (
+              <p style={{ color: "red" }}>Please enter a valid range</p>
+            ) : null}
           </div>
-          <button onClick={handleApplyFilter} className={styles.applyFilterButton}>Apply Filter</button>
-          </div>
+          <button
+            onClick={handleApplyFilter}
+            className={styles.applyFilterButton}
+          >
+            Apply Filter
+          </button>
+        </div>
       </div>
       {isLoading ? (
         <div className={styles.loadingPlaceholder}>
-          <Lottie animationData={LoadingDog}/>
+          <Lottie animationData={LoadingDog} />
         </div>
       ) : (
         <div className={styles.dogCardsContainer}>
-          {dogs.map(dog => (
+          {dogs.map((dog) => (
             <DogCard
-            key={dog.id}
-            dog={dog}
-            onButtonClick={() => toggleFavorite(dog)}
-            buttonLabel={favorites.some(favDog => favDog.id === dog.id) ? "Added to Favorites" : "Add to Favorites"}
-            buttonColor={favorites.some(favDog => favDog.id === dog.id) ? 'green' : '#007BFF'}
-            customStyle={{ maxWidth: '250px' }}
+              key={dog.id}
+              dog={dog}
+              onButtonClick={() => toggleFavorite(dog)}
+              buttonLabel={
+                favorites.some((favDog) => favDog.id === dog.id)
+                  ? "Added to Favorites"
+                  : "Add to Favorites"
+              }
+              buttonColor={
+                favorites.some((favDog) => favDog.id === dog.id)
+                  ? "green"
+                  : "#007BFF"
+              }
+              customStyle={{ maxWidth: "250px" }}
             />
           ))}
         </div>
@@ -227,9 +257,11 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
         handlePrevPage={handlePrevPage}
         setCurrentPage={setCurrentPage}
       />
-      <button onClick={onLogout} className={styles.logoutButton}>Log Out</button>
+      <button onClick={onLogout} className={styles.logoutButton}>
+        Log Out
+      </button>
     </div>
-  )
-}
+  );
+};
 
 export default SearchPage;
