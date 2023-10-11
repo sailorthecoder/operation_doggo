@@ -44,7 +44,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
       setBreeds(breedsFromData);
     };
     fetchBreeds();
-  }, []);
+  }, [dogData.dogData]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -76,7 +76,14 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
       setIsLoading(false);
     };
     fetchDogs();
-  }, [selectedBreed, currentPage, isAscending, ageMin, ageMax]);
+  }, [
+    selectedBreed,
+    currentPage,
+    isAscending,
+    ageMin,
+    ageMax,
+    dogData.dogData,
+  ]);
 
   const handleApplyFilter = () => {
     let isInvalid = false;
@@ -245,7 +252,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
                   ? "green"
                   : "#007BFF"
               }
-              customStyle={{ maxWidth: "250px" }}
+              customStyle={{ width: "250px" }}
             />
           ))}
         </div>
