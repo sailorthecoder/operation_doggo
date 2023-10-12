@@ -58,10 +58,27 @@ export interface PaginationControlsProps {
   setCurrentPage: (page: number) => void;
 }
 
-export type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
+export interface FilterProps {
+  selectedBreed: string | null;
+  ageMin: number | null;
+  setAgeMin: React.Dispatch<React.SetStateAction<number | null>>;
+  ageMax: number | null;
+  setAgeMax: React.Dispatch<React.SetStateAction<number | null>>;
+  dogData: {
+    dogData: Dog[];
   };
-};
+  isAscending: boolean;
+  setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  filterDogs: (
+    breed: string | null,
+    minAge: number | null,
+    maxAge: number | null,
+    isAsc: boolean
+  ) => Dog[];
+}
+
+export interface SortModalProps {
+  filterProps: FilterProps;
+  onClose: () => void;
+}

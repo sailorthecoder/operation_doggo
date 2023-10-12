@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import FavoritesModal from "../components/FavoritesModal";
+import SortModal from "../components/SortModal";
 import DogCard from "../components/DogCard";
 import PaginationControls from "../components/PaginationControls";
 import { Dog, SearchPageProps } from "../types";
 import db from "../db.json";
 import LoadingDog from "../../public/lottieFiles/LoadingDog.json";
 import Lottie from "lottie-react";
-import styles from "./css/dogSearchPage.module.css";
+import styles from "./css/search.module.css";
 
 export const getStaticProps = async () => {
   const dogData = db;
@@ -26,15 +27,38 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
   const [totalDogs, setTotalDogs] = useState<number>(0);
   const [ageMin, setAgeMin] = useState<number | null>(null);
   const [ageMax, setAgeMax] = useState<number | null>(null);
-  const [tempAgeMin, setTempAgeMin] = useState<number | null>(null);
-  const [tempAgeMax, setTempAgeMax] = useState<number | null>(null);
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] =
     useState<boolean>(false);
+  const [showSortModal, setShowSortModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const totalPages = useMemo(
     () => Math.ceil(totalDogs / PAGE_SIZE),
     [totalDogs, PAGE_SIZE]
   );
+
+  const filterDogs = (
+    breed: string | null,
+    minAge: number | null,
+    maxAge: number | null,
+    isAsc: boolean
+  ) => {
+    let filteredDogs = dogData.dogData;
+    if (breed) {
+      filteredDogs = filteredDogs.filter((dog) => dog.breed === breed);
+    }
+    if (minAge !== null) {
+      filteredDogs = filteredDogs.filter((dog) => dog.age >= minAge);
+    }
+    if (maxAge !== null) {
+      filteredDogs = filteredDogs.filter((dog) => dog.age <= maxAge);
+    }
+    if (isAsc) {
+      filteredDogs.sort((a, b) => a.breed.localeCompare(b.breed));
+    } else {
+      filteredDogs.sort((a, b) => b.breed.localeCompare(a.breed));
+    }
+    return filteredDogs;
+  };
 
   useEffect(() => {
     const fetchBreeds = () => {
@@ -48,34 +72,15 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
 
   useEffect(() => {
     setIsLoading(true);
-    const fetchDogs = () => {
-      let filteredDogs = dogData.dogData;
-      if (selectedBreed) {
-        filteredDogs = filteredDogs.filter(
-          (dog) => dog.breed === selectedBreed
-        );
-      }
-      if (ageMin !== null) {
-        filteredDogs = filteredDogs.filter((dog) => dog.age >= ageMin);
-      }
-      if (ageMax !== null) {
-        filteredDogs = filteredDogs.filter((dog) => dog.age <= ageMax);
-      }
-      if (isAscending) {
-        filteredDogs.sort((a, b) => a.breed.localeCompare(b.breed));
-      } else {
-        filteredDogs.sort((a, b) => b.breed.localeCompare(a.breed));
-      }
-      const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const paginatedDogs = filteredDogs.slice(
-        startIndex,
-        startIndex + PAGE_SIZE
-      );
-      setTotalDogs(filteredDogs.length);
-      setDogs(paginatedDogs);
-      setIsLoading(false);
-    };
-    fetchDogs();
+    const filteredDogs = filterDogs(selectedBreed, ageMin, ageMax, isAscending);
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const paginatedDogs = filteredDogs.slice(
+      startIndex,
+      startIndex + PAGE_SIZE
+    );
+    setTotalDogs(filteredDogs.length);
+    setDogs(paginatedDogs);
+    setIsLoading(false);
   }, [
     selectedBreed,
     currentPage,
@@ -84,23 +89,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     ageMax,
     dogData.dogData,
   ]);
-
-  const handleApplyFilter = () => {
-    let isInvalid = false;
-    if (tempAgeMin !== null && tempAgeMin < 0) {
-      isInvalid = true;
-    }
-    if (tempAgeMax !== null && tempAgeMax < 0) {
-      isInvalid = true;
-    }
-    if (tempAgeMin !== null && tempAgeMax !== null && tempAgeMin > tempAgeMax) {
-      isInvalid = true;
-    }
-    if (!isInvalid) {
-      setAgeMin(tempAgeMin);
-      setAgeMax(tempAgeMax);
-    }
-  };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -118,13 +106,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     const value = event.target.value;
     setSelectedBreed(value === "all" ? null : value);
     setCurrentPage(1);
-  };
-
-  const toggleSortOrder = () => {
-    setIsAscending((prevIsAscending) => !prevIsAscending);
-    if (selectedBreed === null) {
-      setCurrentPage(1);
-    }
   };
 
   const toggleFavorite = (dog: Dog) => {
@@ -191,44 +172,24 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
           )}
         </div>
         <div className={styles.sortFilterContainer}>
-          {selectedBreed === null && (
-            <button onClick={toggleSortOrder}>
-              Sort by Breed: {isAscending ? "Ascending" : "Descending"}
-            </button>
+          <button onClick={() => setShowSortModal(true)}>Sort & Filter</button>
+          {showSortModal && (
+            <SortModal
+              filterProps={{
+                selectedBreed,
+                ageMin,
+                setAgeMin,
+                ageMax,
+                setAgeMax,
+                dogData,
+                isAscending,
+                setIsAscending,
+                setCurrentPage,
+                filterDogs,
+              }}
+              onClose={() => setShowSortModal(false)}
+            />
           )}
-          <div className={styles.ageFilters}>
-            <label>
-              Filter by Age:
-              <input
-                type="number"
-                min="0"
-                value={tempAgeMin ?? ""}
-                onChange={(e) => setTempAgeMin(Number(e.target.value) || null)}
-                placeholder="Min"
-              />
-              -
-              <input
-                type="number"
-                min="0"
-                value={tempAgeMax ?? ""}
-                onChange={(e) => setTempAgeMax(Number(e.target.value) || null)}
-                placeholder="Max"
-              />
-            </label>
-            {(tempAgeMin !== null && tempAgeMin < 0) ||
-            (tempAgeMax !== null && tempAgeMax < 0) ||
-            (tempAgeMin !== null &&
-              tempAgeMax !== null &&
-              tempAgeMin > tempAgeMax) ? (
-              <p style={{ color: "red" }}>Please enter a valid range</p>
-            ) : null}
-          </div>
-          <button
-            onClick={handleApplyFilter}
-            className={styles.applyFilterButton}
-          >
-            Apply Filter
-          </button>
         </div>
       </div>
       {isLoading ? (

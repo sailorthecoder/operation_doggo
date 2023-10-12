@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { LoginPageProps } from "../types";
 import LoginDog from "../../public/lottieFiles/LoginDog.json";
 import Lottie from "lottie-react";
-import styles from "./css/loginPage.module.css";
+import styles from "./css/index.module.css";
 
 const LoginPage: React.FC<LoginPageProps> = ({ setAuthenticationStatus }) => {
   const [name, setName] = useState<string>("");
