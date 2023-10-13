@@ -17,9 +17,7 @@ export interface Location {
 
 export interface SearchPageProps {
   handleLogout: () => void;
-  dogData: {
-    dogData: Dog[];
-  };
+  dogData: Dog[];
 }
 
 export interface MatchPageProps {
@@ -63,9 +61,7 @@ export interface FilterProps {
   setAgeMin: React.Dispatch<React.SetStateAction<number | null>>;
   ageMax: number | null;
   setAgeMax: React.Dispatch<React.SetStateAction<number | null>>;
-  dogData: {
-    dogData: Dog[];
-  };
+  dogData: Dog[];
   isAscending: boolean;
   setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;

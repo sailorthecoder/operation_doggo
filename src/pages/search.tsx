@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import FavoritesModal from "../components/FavoritesModal";
 import SortModal from "../components/SortModal";
@@ -27,7 +27,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     isAscending,
     setIsAscending,
     filterDogs,
-  } = useDogFilter(dogData.dogData);
+  } = useDogFilter(dogData);
   const {
     data: dogs,
     currentPage,
@@ -37,7 +37,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     setCurrentPage,
     isLoading,
   } = usePagination({
-    initialData: dogData.dogData,
+    initialData: dogData,
     filterFunction: () =>
       filterDogs(selectedBreed, ageMin, ageMax, isAscending),
   });
@@ -49,14 +49,15 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
   const [showSortModal, setShowSortModal] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log("dog data inside fetchbreed effect:", dogData);
     const fetchBreeds = () => {
       const breedsFromData = Array.from(
-        new Set(dogData.dogData.map((dog) => dog.breed))
+        new Set(dogData.map((dog) => dog.breed))
       ).sort();
       setBreeds(breedsFromData);
     };
     fetchBreeds();
-  }, [dogData.dogData]);
+  }, [dogData]);
 
   const handleBreedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
