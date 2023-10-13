@@ -6,38 +6,35 @@ const useDogFilter = (dogData: Dog[]) => {
   const [ageMin, setAgeMin] = useState<number | null>(null);
   const [ageMax, setAgeMax] = useState<number | null>(null);
   const [isAscending, setIsAscending] = useState<boolean>(true);
+  const [sortBy, setSortBy] = useState<"breed" | "age">("breed");
 
-  const filterDogs = useCallback(
-    (
-      breed: string | null,
-      minAge: number | null,
-      maxAge: number | null,
-      isAsc: boolean
-    ) => {
-      let filteredDogs = dogData;
+  const filterDogs = useCallback(() => {
+    let filteredDogs = [...dogData];
 
-      if (breed) {
-        filteredDogs = filteredDogs.filter((dog) => dog.breed === breed);
-      }
+    if (selectedBreed) {
+      filteredDogs = filteredDogs.filter((dog) => dog.breed === selectedBreed);
+    }
 
-      if (minAge !== null) {
-        filteredDogs = filteredDogs.filter((dog) => dog.age >= minAge);
-      }
+    if (ageMin !== null) {
+      filteredDogs = filteredDogs.filter((dog) => dog.age >= ageMin);
+    }
 
-      if (maxAge !== null) {
-        filteredDogs = filteredDogs.filter((dog) => dog.age <= maxAge);
-      }
+    if (ageMax !== null) {
+      filteredDogs = filteredDogs.filter((dog) => dog.age <= ageMax);
+    }
 
-      if (isAsc) {
-        filteredDogs.sort((a, b) => a.breed.localeCompare(b.breed));
+    filteredDogs.sort((a, b) => {
+      if (sortBy === "breed") {
+        return isAscending
+          ? a.breed.localeCompare(b.breed)
+          : b.breed.localeCompare(a.breed);
       } else {
-        filteredDogs.sort((a, b) => b.breed.localeCompare(a.breed));
+        return isAscending ? a.age - b.age : b.age - a.age;
       }
+    });
 
-      return filteredDogs;
-    },
-    [dogData]
-  );
+    return filteredDogs;
+  }, [dogData, selectedBreed, ageMin, ageMax, isAscending, sortBy]);
 
   return {
     selectedBreed,
@@ -48,6 +45,8 @@ const useDogFilter = (dogData: Dog[]) => {
     setAgeMax,
     isAscending,
     setIsAscending,
+    sortBy,
+    setSortBy,
     filterDogs,
   };
 };

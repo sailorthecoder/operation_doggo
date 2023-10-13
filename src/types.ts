@@ -64,6 +64,8 @@ export interface FilterProps {
   dogData: Dog[];
   isAscending: boolean;
   setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
+  sortBy: "breed" | "age";
+  setSortBy: React.Dispatch<React.SetStateAction<"breed" | "age">>;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   filterDogs: (
     breed: string | null,

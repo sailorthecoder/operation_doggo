@@ -26,6 +26,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     setAgeMax,
     isAscending,
     setIsAscending,
+    sortBy,
+    setSortBy,
     filterDogs,
   } = useDogFilter(dogData);
   const {
@@ -38,8 +40,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     isLoading,
   } = usePagination({
     initialData: dogData,
-    filterFunction: () =>
-      filterDogs(selectedBreed, ageMin, ageMax, isAscending),
+    filterFunction: filterDogs,
   });
   const router = useRouter();
   const [breeds, setBreeds] = useState<string[]>([]);
@@ -141,6 +142,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
                 isAscending,
                 setIsAscending,
                 setCurrentPage,
+                sortBy,
+                setSortBy,
                 filterDogs,
               }}
               onClose={() => setShowSortModal(false)}

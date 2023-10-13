@@ -11,6 +11,8 @@ const SortModal: React.FC<SortModalProps> = ({
     setAgeMax,
     setIsAscending,
     setCurrentPage,
+    sortBy,
+    setSortBy,
   },
   onClose,
 }) => {
@@ -18,17 +20,29 @@ const SortModal: React.FC<SortModalProps> = ({
   const [localTempAgeMax, setLocalTempAgeMax] = useState<number | null>(ageMax);
   const [localIsAscending, setLocalIsAscending] =
     useState<boolean>(isAscending);
+  const [localSortBy, setLocalSortBy] = useState<"breed" | "age">(sortBy);
 
   const applyTempFilters = () => {
     setAgeMin(localTempAgeMin);
     setAgeMax(localTempAgeMax);
     setIsAscending(localIsAscending);
+    setSortBy(localSortBy);
     setCurrentPage(1);
   };
 
   const applyChangesAndClose = () => {
     applyTempFilters();
     onClose();
+  };
+
+  const getCurrentSortOption = (): string => {
+    if (localSortBy === "breed" && localIsAscending)
+      return "Breed Name (A - Z)";
+    if (localSortBy === "breed" && !localIsAscending)
+      return "Breed Name (Z - A)";
+    if (localSortBy === "age" && localIsAscending) return "Age (Low - High)";
+    if (localSortBy === "age" && !localIsAscending) return "Age (High - Low)";
+    return "Age (Low - High)";
   };
 
   return (
@@ -41,12 +55,24 @@ const SortModal: React.FC<SortModalProps> = ({
           <div className={styles.sortSection}>
             <h3>Sort by</h3>
             <select
-              value={localIsAscending ? "ascending" : "descending"}
-              onChange={() => setLocalIsAscending((prev) => !prev)}
+              value={getCurrentSortOption()}
               className={styles.breedSortSelect}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.includes("Breed")) {
+                  setLocalSortBy("breed");
+                } else {
+                  setLocalSortBy("age");
+                }
+                setLocalIsAscending(
+                  value.includes("A - Z") || value.includes("Low - High")
+                );
+              }}
             >
-              <option value="ascending">Sort by Breed Ascending</option>
-              <option value="descending">Sort by Breed Descending</option>
+              <option value="Age (Low - High)">Age (Low - High)</option>
+              <option value="Age (High - Low)">Age (High - Low)</option>
+              <option value="Breed Name (A - Z)">Breed Name (A - Z)</option>
+              <option value="Breed Name (Z - A)">Breed Name (Z - A)</option>
             </select>
           </div>
 
