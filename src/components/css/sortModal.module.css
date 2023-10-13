@@ -15,7 +15,6 @@
   padding: 32px;
   border-radius: 8px;
   max-width: 400px;
-  width: 100%;
 }
 
 .breedSelect,
@@ -47,4 +46,8 @@
   align-items: center;
   font-family: Arial, sans-serif;
   font-size: 15px;
+}
+
+.sortModal .breedSortSelect {
+  width: 50%;
 }

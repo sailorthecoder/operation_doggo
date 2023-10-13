@@ -4,6 +4,8 @@ import FavoritesModal from "../components/FavoritesModal";
 import SortModal from "../components/SortModal";
 import DogCard from "../components/DogCard";
 import PaginationControls from "../components/PaginationControls";
+import useDogFilter from "../hooks/useDogFilter";
+import usePagination from "../hooks/usePagination";
 import { Dog, SearchPageProps } from "../types";
 import db from "../db.json";
 import LoadingDog from "../../public/lottieFiles/LoadingDog.json";
@@ -11,54 +13,40 @@ import Lottie from "lottie-react";
 import styles from "./css/search.module.css";
 
 export const getStaticProps = async () => {
-  const dogData = db;
-  return { props: { dogData } };
+  return { props: { dogData: db.dogData } };
 };
 
 const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
-  const PAGE_SIZE = 25;
+  const {
+    selectedBreed,
+    setSelectedBreed,
+    ageMin,
+    setAgeMin,
+    ageMax,
+    setAgeMax,
+    isAscending,
+    setIsAscending,
+    filterDogs,
+  } = useDogFilter(dogData.dogData);
+  const {
+    data: dogs,
+    currentPage,
+    totalPages,
+    handleNextPage,
+    handlePrevPage,
+    setCurrentPage,
+    isLoading,
+  } = usePagination({
+    initialData: dogData.dogData,
+    filterFunction: () =>
+      filterDogs(selectedBreed, ageMin, ageMax, isAscending),
+  });
   const router = useRouter();
   const [breeds, setBreeds] = useState<string[]>([]);
-  const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
-  const [dogs, setDogs] = useState<Dog[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isAscending, setIsAscending] = useState<boolean>(true);
   const [favorites, setFavorites] = useState<Dog[]>([]);
-  const [totalDogs, setTotalDogs] = useState<number>(0);
-  const [ageMin, setAgeMin] = useState<number | null>(null);
-  const [ageMax, setAgeMax] = useState<number | null>(null);
   const [isFavoritesModalOpen, setIsFavoritesModalOpen] =
     useState<boolean>(false);
   const [showSortModal, setShowSortModal] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const totalPages = useMemo(
-    () => Math.ceil(totalDogs / PAGE_SIZE),
-    [totalDogs, PAGE_SIZE]
-  );
-
-  const filterDogs = (
-    breed: string | null,
-    minAge: number | null,
-    maxAge: number | null,
-    isAsc: boolean
-  ) => {
-    let filteredDogs = dogData.dogData;
-    if (breed) {
-      filteredDogs = filteredDogs.filter((dog) => dog.breed === breed);
-    }
-    if (minAge !== null) {
-      filteredDogs = filteredDogs.filter((dog) => dog.age >= minAge);
-    }
-    if (maxAge !== null) {
-      filteredDogs = filteredDogs.filter((dog) => dog.age <= maxAge);
-    }
-    if (isAsc) {
-      filteredDogs.sort((a, b) => a.breed.localeCompare(b.breed));
-    } else {
-      filteredDogs.sort((a, b) => b.breed.localeCompare(a.breed));
-    }
-    return filteredDogs;
-  };
 
   useEffect(() => {
     const fetchBreeds = () => {
@@ -69,38 +57,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     };
     fetchBreeds();
   }, [dogData.dogData]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    const filteredDogs = filterDogs(selectedBreed, ageMin, ageMax, isAscending);
-    const startIndex = (currentPage - 1) * PAGE_SIZE;
-    const paginatedDogs = filteredDogs.slice(
-      startIndex,
-      startIndex + PAGE_SIZE
-    );
-    setTotalDogs(filteredDogs.length);
-    setDogs(paginatedDogs);
-    setIsLoading(false);
-  }, [
-    selectedBreed,
-    currentPage,
-    isAscending,
-    ageMin,
-    ageMax,
-    dogData.dogData,
-  ]);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
 
   const handleBreedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -176,7 +132,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
           {showSortModal && (
             <SortModal
               filterProps={{
-                selectedBreed,
                 ageMin,
                 setAgeMin,
                 ageMax,

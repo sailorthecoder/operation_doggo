@@ -59,7 +59,6 @@ export interface PaginationControlsProps {
 }
 
 export interface FilterProps {
-  selectedBreed: string | null;
   ageMin: number | null;
   setAgeMin: React.Dispatch<React.SetStateAction<number | null>>;
   ageMax: number | null;
@@ -81,4 +80,10 @@ export interface FilterProps {
 export interface SortModalProps {
   filterProps: FilterProps;
   onClose: () => void;
+}
+
+export interface UsePaginationProps {
+  initialData: Dog[];
+  filterFunction: (data: Dog[]) => Dog[];
+  pageSize?: number;
 }
