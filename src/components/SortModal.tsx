@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./css/sortModal.module.css";
 import { SortModalProps } from "../types";
+import Slider from "./Slider";
 
 const SortModal: React.FC<SortModalProps> = ({
   dogData,
@@ -98,35 +99,20 @@ const SortModal: React.FC<SortModalProps> = ({
           <div className={styles.filterSection}>
             <h3>Filters</h3>
             <div className={styles.ageFilters}>
-              <label>
-                Min:
-                <input
-                  type="number"
-                  min="0"
-                  value={localTempAgeMin ?? ""}
-                  onChange={(e) =>
-                    setLocalTempAgeMin(Number(e.target.value) || null)
-                  }
-                  placeholder="Min"
-                />
-              </label>
-              <label>
-                Max:
-                <input
-                  type="number"
-                  min="0"
-                  value={localTempAgeMax ?? ""}
-                  onChange={(e) =>
-                    setLocalTempAgeMax(Number(e.target.value) || null)
-                  }
-                  placeholder="Max"
-                />
-              </label>
+              <Slider
+                min={0}
+                max={15}
+                values={[localTempAgeMin ?? 0, localTempAgeMax ?? 15]}
+                onChange={(values) => {
+                  setLocalTempAgeMin(values[0]);
+                  setLocalTempAgeMax(values[1]);
+                }}
+              />
             </div>
             <div className={styles.locationFilter}>
               <label>
-                City:
                 <input
+                  placeholder="City"
                   list="cityOptions"
                   value={localCityFilter ?? ""}
                   onChange={(e) => setLocalCityFilter(e.target.value)}
@@ -141,8 +127,8 @@ const SortModal: React.FC<SortModalProps> = ({
 
             <div className={styles.locationFilter}>
               <label>
-                State:
                 <input
+                  placeholder="State"
                   list="stateOptions"
                   value={localStateFilter ?? ""}
                   onChange={(e) => setLocalStateFilter(e.target.value)}
@@ -157,8 +143,8 @@ const SortModal: React.FC<SortModalProps> = ({
 
             <div className={styles.locationFilter}>
               <label>
-                Zip Code:
                 <input
+                  placeholder="Zip Code"
                   list="zipOptions"
                   value={localZipFilter ?? ""}
                   onChange={(e) => setLocalZipFilter(e.target.value)}

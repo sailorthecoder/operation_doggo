@@ -92,3 +92,10 @@ export interface UsePaginationProps {
   filterFunction: (data: Dog[]) => Dog[];
   pageSize?: number;
 }
+
+export interface SliderProps {
+  min: number;
+  max: number;
+  values: number[];
+  onChange: (values: number[]) => void;
+}

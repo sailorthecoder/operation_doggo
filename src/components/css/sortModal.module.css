@@ -4,23 +4,25 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .modal {
   background-color: #fff;
-  padding: 32px;
+  padding: 50px 50px 60px 50px;
   border-radius: 8px;
-  max-width: 400px;
+  max-width: 500px;
+  position: relative;
 }
 
-.breedSelect,
 .ageFilters,
-.applyFilterButton {
-  margin: 10px 0;
+.breedSelect,
+.locationFilter {
+  margin: 20px 0;
 }
 
 .sortModal {
@@ -48,6 +50,55 @@
   font-size: 15px;
 }
 
+.sortModal .closeButton:hover {
+  background: #d32f2f;
+}
+
 .sortModal .breedSortSelect {
+  width: 90%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+}
+
+.sortModal h3 {
+  margin-top: 24px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.applyFilterButton {
+  background: #3f51b5;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease-in-out;
+  display: block;
   width: 50%;
+  text-align: center;
+  font-size: 16px;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.applyFilterButton:hover {
+  background: #303f9f;
+}
+
+.locationFilter input {
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  width: 90%;
+}
+
+.locationFilter label {
+  font-weight: 500;
+}
+
+.filterSection h3 {
+  margin-top: 40px;
 }
