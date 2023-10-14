@@ -28,6 +28,12 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
     setIsAscending,
     sortBy,
     setSortBy,
+    cityFilter,
+    setCityFilter,
+    stateFilter,
+    setStateFilter,
+    zipFilter,
+    setZipFilter,
     filterDogs,
   } = useDogFilter(dogData);
   const {
@@ -50,7 +56,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
   const [showSortModal, setShowSortModal] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("dog data inside fetchbreed effect:", dogData);
     const fetchBreeds = () => {
       const breedsFromData = Array.from(
         new Set(dogData.map((dog) => dog.breed))
@@ -133,6 +138,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
           <button onClick={() => setShowSortModal(true)}>Sort & Filter</button>
           {showSortModal && (
             <SortModal
+              dogData={dogData}
               filterProps={{
                 ageMin,
                 setAgeMin,
@@ -144,6 +150,12 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
                 setCurrentPage,
                 sortBy,
                 setSortBy,
+                cityFilter,
+                setCityFilter,
+                stateFilter,
+                setStateFilter,
+                zipFilter,
+                setZipFilter,
                 filterDogs,
               }}
               onClose={() => setShowSortModal(false)}

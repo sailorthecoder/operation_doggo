@@ -66,6 +66,12 @@ export interface FilterProps {
   setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
   sortBy: "breed" | "age";
   setSortBy: React.Dispatch<React.SetStateAction<"breed" | "age">>;
+  cityFilter: string | null;
+  setCityFilter: React.Dispatch<React.SetStateAction<string | null>>;
+  stateFilter: string | null;
+  setStateFilter: React.Dispatch<React.SetStateAction<string | null>>;
+  zipFilter: string | null;
+  setZipFilter: React.Dispatch<React.SetStateAction<string | null>>;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   filterDogs: (
     breed: string | null,
@@ -76,6 +82,7 @@ export interface FilterProps {
 }
 
 export interface SortModalProps {
+  dogData: Dog[];
   filterProps: FilterProps;
   onClose: () => void;
 }

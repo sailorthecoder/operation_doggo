@@ -3,6 +3,7 @@ import styles from "./css/sortModal.module.css";
 import { SortModalProps } from "../types";
 
 const SortModal: React.FC<SortModalProps> = ({
+  dogData,
   filterProps: {
     ageMin,
     ageMax,
@@ -13,6 +14,12 @@ const SortModal: React.FC<SortModalProps> = ({
     setCurrentPage,
     sortBy,
     setSortBy,
+    cityFilter,
+    setCityFilter,
+    stateFilter,
+    setStateFilter,
+    zipFilter,
+    setZipFilter,
   },
   onClose,
 }) => {
@@ -21,12 +28,24 @@ const SortModal: React.FC<SortModalProps> = ({
   const [localIsAscending, setLocalIsAscending] =
     useState<boolean>(isAscending);
   const [localSortBy, setLocalSortBy] = useState<"breed" | "age">(sortBy);
+  const [localCityFilter, setLocalCityFilter] = useState<string | null>(
+    cityFilter
+  );
+  const [localStateFilter, setLocalStateFilter] = useState<string | null>(
+    stateFilter
+  );
+  const [localZipFilter, setLocalZipFilter] = useState<string | null>(
+    zipFilter
+  );
 
   const applyTempFilters = () => {
     setAgeMin(localTempAgeMin);
     setAgeMax(localTempAgeMax);
     setIsAscending(localIsAscending);
     setSortBy(localSortBy);
+    setCityFilter(localCityFilter);
+    setStateFilter(localStateFilter);
+    setZipFilter(localZipFilter);
     setCurrentPage(1);
   };
 
@@ -77,7 +96,7 @@ const SortModal: React.FC<SortModalProps> = ({
           </div>
 
           <div className={styles.filterSection}>
-            <h3>Age</h3>
+            <h3>Filters</h3>
             <div className={styles.ageFilters}>
               <label>
                 Min:
@@ -102,6 +121,53 @@ const SortModal: React.FC<SortModalProps> = ({
                   }
                   placeholder="Max"
                 />
+              </label>
+            </div>
+            <div className={styles.locationFilter}>
+              <label>
+                City:
+                <input
+                  list="cityOptions"
+                  value={localCityFilter ?? ""}
+                  onChange={(e) => setLocalCityFilter(e.target.value)}
+                />
+                <datalist id="cityOptions">
+                  {dogData.map((dog) => (
+                    <option value={dog.city} key={dog.id + "_city"} />
+                  ))}
+                </datalist>
+              </label>
+            </div>
+
+            <div className={styles.locationFilter}>
+              <label>
+                State:
+                <input
+                  list="stateOptions"
+                  value={localStateFilter ?? ""}
+                  onChange={(e) => setLocalStateFilter(e.target.value)}
+                />
+                <datalist id="stateOptions">
+                  {dogData.map((dog) => (
+                    <option value={dog.state} key={dog.id + "_state"} />
+                  ))}
+                </datalist>
+              </label>
+            </div>
+
+            <div className={styles.locationFilter}>
+              <label>
+                Zip Code:
+                <input
+                  list="zipOptions"
+                  value={localZipFilter ?? ""}
+                  onChange={(e) => setLocalZipFilter(e.target.value)}
+                />
+                <datalist id="zipOptions">
+                  {dogData.map((dog) => (
+                    <option value={dog.zip_code} key={dog.id + "_zip"} />
+                  ))}
+                </datalist>
               </label>
             </div>
           </div>
