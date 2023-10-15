@@ -17,8 +17,11 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
   };
 
   return (
-    <div className={styles.favoritesModalOverlay}>
-      <div className={styles.favoritesModal}>
+    <div className={styles.favoritesModalOverlay} onClick={onClose}>
+      <div
+        className={styles.favoritesModal}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button className={styles.closeModalBtn} onClick={onClose}>
           x
         </button>
