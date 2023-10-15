@@ -30,7 +30,7 @@ const FavoritesModal: React.FC<FavoritesModalProps> = ({
             buttonLabel="Remove from Favorites"
           />
         ))}
-        <button onClick={getMatch} className={styles.getMatchButton}>
+        <button onClick={getMatch} className={styles.getMatchBtn}>
           Get Matched!
         </button>
       </div>

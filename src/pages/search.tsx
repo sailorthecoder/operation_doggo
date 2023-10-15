@@ -125,17 +125,25 @@ const SearchPage: React.FC<SearchPageProps> = ({ handleLogout, dogData }) => {
           </select>
           {favorites.length > 0 && (
             <div className={styles.buttonsContainer}>
-              <button onClick={() => setIsFavoritesModalOpen(true)}>
+              <button
+                onClick={() => setIsFavoritesModalOpen(true)}
+                className={styles.favoritesBtn}
+              >
                 Favorites: 🐕 {favorites.length} 🐕
               </button>
-              <button onClick={getMatch} className={styles.getMatchButton}>
+              <button onClick={getMatch} className={styles.getMatchBtn}>
                 Get Matched!
               </button>
             </div>
           )}
         </div>
         <div className={styles.sortFilterContainer}>
-          <button onClick={() => setShowSortModal(true)}>Sort & Filter</button>
+          <button
+            onClick={() => setShowSortModal(true)}
+            className={styles.sortFilterBtn}
+          >
+            Sort & Filter
+          </button>
           {showSortModal && (
             <SortModal
               dogData={dogData}

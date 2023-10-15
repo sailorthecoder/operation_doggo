@@ -58,12 +58,12 @@
   gap: 10px;
 }
 
-.dogSearchPage .getMatchButton {
+.dogSearchPage .getMatchBtn {
   background-color: green;
   color: white;
 }
 
-.dogSearchPage .getMatchButton:hover {
+.dogSearchPage .getMatchBtn:hover {
   background-color: darkgreen;
 }
 
@@ -130,4 +130,25 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-column-gap: 50px;
+}
+
+@media (max-width: 850px) {
+  .dogSearchPage .buttonsContainer {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 0;
+    transform: none;
+  }
+  .dogSearchPage .sortFilterBtn {
+    margin: 0px;
+  }
+}
+
+.dogSearchPage .favoritesBtn {
+  background-color: rgb(153, 26, 153);
+}
+
+.dogSearchPage .favoritesBtn:hover {
+  background-color: rgb(105, 20, 105);
 }
