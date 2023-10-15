@@ -56,6 +56,7 @@
   transform: translateY(-50%);
   display: flex;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .dogSearchPage .getMatchBtn {
@@ -139,9 +140,6 @@
     position: relative;
     top: 0;
     transform: none;
-  }
-  .dogSearchPage .sortFilterBtn {
-    margin: 0px;
   }
 }
 
